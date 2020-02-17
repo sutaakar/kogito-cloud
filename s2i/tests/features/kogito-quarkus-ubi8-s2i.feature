@@ -30,6 +30,14 @@ Feature: kogito-quarkus-ubi8-s2i image tests
     And container log should contain DEBUG [io.qua.
     And run sh -c 'echo $JAVA_OPTIONS' in container and immediately check its output for -Dquarkus.log.level=DEBUG
 
+  Scenario: Verify if the s2i build is finished as expected performing project structure generation and a non native build
+    Then check that page is served
+      | property        | value                    |
+      | port            | 8080                     |
+      | path            | /hello                   |
+      | wait            | 80                       |
+      | expected_phrase | Mario is older than Mark |
+
   Scenario: Verify if the s2i build is finished as expected performing a non native build and if it is listening on the expected port
     Given s2i build /tmp/kogito-examples from drools-quarkus-example using 0.7.0 and runtime-image quay.io/kiegroup/kogito-quarkus-jvm-ubi8:latest
       | variable | value |
@@ -112,4 +120,13 @@ Feature: kogito-quarkus-ubi8-s2i image tests
       | NATIVE            | false                           |
       | KOGITO_VERSION    | 8.0.0-SNAPSHOT                  |
     Then file /home/kogito/bin/project-1.0-SNAPSHOT-runner.jar should exist
+    And check that page is served
+      | property        | value                           |
+      | port            | 8080                            |
+      | path            | /Traffic Violation              |
+      | wait            | 80                              |
+      | expected_phrase | Should the driver be suspended? |
+      | request_method  | POST                            |
+      | content_type    | application/json                |
+      | request_body    | {"Driver": {"Points": 2}, "Violation": {"Type": "speed","Actual Speed": 120,"Speed Limit": 100}} |
 
